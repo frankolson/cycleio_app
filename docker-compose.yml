@@ -11,6 +11,8 @@ services:
       - ./backend:/recipe_app/backend
     ports:
       - "8000:3000"
+    environment:
+      - DEVISE_JWT_SECRET_KEY=e7625b928556754a51ecc005f65dd4c0e2e6af9fba9f57eb0b2642acfb912eca489c82d584cff7acc13348edebc9e11f951323ade444b69472d0a0ac5151f6f4
     depends_on:
       - db
   frontend:
