@@ -1,13 +1,15 @@
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = 'http://localhost:8000/'
 
 function callApi(endpoint: string, authenticated: boolean) {
-  const token = localStorage.getItem('access_token') || null
+  const token = localStorage.getItem('id_token') || null
+  console.log(token);
+
   let config = {}
 
   if(authenticated) {
     if(token) {
       config = {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': token }
       }
     }
     else {
@@ -16,9 +18,7 @@ function callApi(endpoint: string, authenticated: boolean) {
   }
 
   return fetch(BASE_URL + endpoint, config)
-    .then(response =>
-      response.text().then(text => ({ text, response }))
-    ).then(({ text }) => text)
+    .then(response => response.json())
     .catch((err: any) => console.log(err))
 }
 
@@ -32,16 +32,15 @@ export default (store: any) => (next: any) => (action: any) => {
   }
 
   const { endpoint, types, authenticated } = callAPI
+  const [ requestType, successType, errorType ] = types
 
-  const [ successType, errorType ] = types
+  store.dispatch({type: requestType});
 
   return callApi(endpoint, authenticated).then(
-    response =>
-      next({
-        response,
-        authenticated,
-        type: successType
-      }),
+    response => next({
+      response,
+      type: successType
+    }),
     error => next({
       error: error.message || 'There was an error.',
       type: errorType

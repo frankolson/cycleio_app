@@ -4,11 +4,15 @@ import App from '../components/App';
 import { Store } from '../types';
 
 function mapStateToProps(state: Store) {
-  const { auth: { isAuthenticated, errorMessage } } = state
+  const {
+    auth: { isAuthenticated, errorMessage },
+    recipes
+  } = state
 
   return {
     isAuthenticated,
-    errorMessage
+    errorMessage,
+    recipes: recipes.recipes || [],
   }
 }
 

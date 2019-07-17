@@ -5,7 +5,11 @@ export interface Auth {
   user?: Creds;
 }
 
-export interface Recipes {}
+export interface Recipes {
+  isFetching: boolean;
+  errorMessage?: string;
+  recipes: Recipe[];
+}
 
 export interface Store {
   auth: Auth;
@@ -19,4 +23,11 @@ export interface User {
 export interface Creds {
   email: string;
   password: string;
+}
+
+export interface Recipe {
+  title: string;
+  description: string;
+  favorited: boolean;
+  favorites_count: number;
 }

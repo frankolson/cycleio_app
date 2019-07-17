@@ -1,4 +1,5 @@
-import { Creds, User } from "../types";
+import { Creds, User, Recipe } from "../types";
+import { CALL_API } from '../middleware/api'
 
 // Constants and constant types
 export const LOGIN_REQUEST = 'LOGIN_REQUEST'
@@ -15,6 +16,15 @@ export type LOGOUT_REQUEST = typeof LOGOUT_REQUEST;
 
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
 export type LOGOUT_SUCCESS = typeof LOGOUT_SUCCESS;
+
+export const RECIPES_REQUEST = 'RECIPES_REQUEST'
+export type RECIPES_REQUEST = typeof RECIPES_REQUEST;
+
+export const RECIPES_SUCCESS = 'RECIPES_SUCCESS'
+export type RECIPES_SUCCESS = typeof RECIPES_SUCCESS;
+
+export const RECIPES_FAILURE = 'RECIPES_FAILURE'
+export type RECIPES_FAILURE = typeof RECIPES_FAILURE;
 
 // Action interfaces
 export interface RequestLogin {
@@ -38,7 +48,6 @@ export interface LoginError {
   message: string;
 }
 
-
 export interface RequestLogout {
   type: LOGOUT_REQUEST;
   isFetching: boolean;
@@ -51,7 +60,25 @@ export interface ReceiveLogout {
   isAuthenticated: boolean;
 }
 
-export type ACTIONS = RequestLogin | ReceiveLogin | LoginError | RequestLogout | ReceiveLogout
+export interface RequestRecipes {
+  type: RECIPES_REQUEST;
+  isFetching: boolean;
+}
+
+export interface ReceiveRecipes {
+  type: RECIPES_SUCCESS;
+  isFetching: boolean;
+  response: Recipe[];
+}
+
+export interface RecipesError {
+  type: RECIPES_FAILURE;
+  isFetching: boolean;
+  message: string;
+}
+
+export type AUTH_ACTIONS = RequestLogin | ReceiveLogin | LoginError | RequestLogout | ReceiveLogout;
+export type RECIPE_ACTIONS = RequestRecipes | ReceiveRecipes | RecipesError;
 
 
 // Action creators
@@ -98,6 +125,16 @@ function receiveLogout(): ReceiveLogout {
   }
 }
 
+export function fetchRecipes(isAuthenticated: boolean) {
+  return {
+    [CALL_API]: {
+      endpoint: 'recipes',
+      types: [RECIPES_REQUEST, RECIPES_SUCCESS, RECIPES_FAILURE],
+      authenticated: isAuthenticated,
+    }
+  }
+}
+
 // Login function
 export function loginUser(creds: Creds) {
   const config = {
@@ -116,8 +153,7 @@ export function loginUser(creds: Creds) {
         if (!response.ok) {
           dispatch(loginError(user.message))
         } else {
-          localStorage.setItem('id_token', user.id_token)
-          localStorage.setItem('id_token', user.access_token)
+          localStorage.setItem('id_token', response.headers.get('Authorization') || '')
 
           dispatch(receiveLogin(user))
         }
@@ -131,7 +167,6 @@ export function logoutUser() {
     dispatch(requestLogout())
 
     localStorage.removeItem('id_token')
-    localStorage.removeItem('access_token')
 
     dispatch(receiveLogout())
   }

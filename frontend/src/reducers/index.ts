@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import {
-  LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT_SUCCESS, ACTIONS
+  LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT_SUCCESS, AUTH_ACTIONS,
+  RECIPES_REQUEST, RECIPES_SUCCESS, RECIPES_FAILURE, RECIPE_ACTIONS
 } from '../actions'
 import { Auth, Recipes } from '../types';
 
@@ -10,7 +11,7 @@ import { Auth, Recipes } from '../types';
 function auth(state: Auth = {
   isFetching: false,
   isAuthenticated: localStorage.getItem('id_token') ? true : false
-}, action: ACTIONS) {
+}, action: AUTH_ACTIONS) {
   switch (action.type) {
     case LOGIN_REQUEST:
       return Object.assign({}, state, {
@@ -40,9 +41,24 @@ function auth(state: Auth = {
   }
 }
 
-function recipes(state: Recipes = {}, action: ACTIONS) {
+function recipes(state: Recipes = {
+  isFetching: false,
+  recipes: [],
+}, action: RECIPE_ACTIONS) {
   switch (action.type) {
-
+    case RECIPES_REQUEST:
+      return Object.assign({}, state, {
+        isFetching: true
+      })
+    case RECIPES_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        recipes: action.response,
+      })
+    case RECIPES_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false
+      })
     default:
       return state
   }
