@@ -15,7 +15,7 @@ cd recipe_app
 
 # Setup
 docker-compose run frontend npm install
-docker-compose run backend rake db:create db:seed
+docker-compose run backend rake db:create db:migrate db:seed
 
 # Start
 docker-compose up
